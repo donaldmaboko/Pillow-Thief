@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Environment files — never commit secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Expo
+apps/mobile/.expo/
+apps/mobile/dist/
+apps/mobile/ios/
+apps/mobile/android/
+expo-env.d.ts
+
+# Next.js
+apps/admin/.next/
+apps/admin/out/
+apps/admin/build/
+.next/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Logs & misc
+npm-debug.log*
+yarn-error.log*
+.DS_Store
+coverage/
+
+# Supabase local dev
+supabase/.temp/

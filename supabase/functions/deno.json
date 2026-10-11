@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "deno.window"
+    ],
+    "strict": true
+  },
+  "imports": {
+    "zod": "npm:zod@3.23.8",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2.45.4"
+  },
+  "tasks": {
+    "test": "deno test --allow-env --allow-net --config deno.json _shared/shared_test.ts"
+  }
+}
