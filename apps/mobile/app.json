@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "name": "Pillow Thief",
+    "slug": "pillow-thief",
+    "scheme": "pillowthief",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#FFF1E8",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFF1E8"
+    },
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "app.pillowthief.mobile",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Pillow Thief uses your location to find cuddle providers near you and to set meeting locations. You can always search manually instead.",
+        "UIBackgroundModes": ["remote-notification"]
+      },
+      "config": {
+        "googleMapsApiKey": ""
+      }
+    },
+    "android": {
+      "package": "app.pillowthief.mobile",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F48FB1"
+      },
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "POST_NOTIFICATIONS"],
+      "config": {
+        "googleMaps": {
+          "apiKey": ""
+        }
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "color": "#F48FB1"
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Pillow Thief uses your location to find cuddle providers near you and to set meeting locations. You can always search manually instead."
+        }
+      ],
+      [
+        "react-native-maps",
+        {
+          "iosGoogleMapsKey": "",
+          "androidGoogleMapsKey": ""
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
