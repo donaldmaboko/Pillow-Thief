@@ -1,0 +1,17 @@
+{
+  "name": "pillow-thief",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Pillow Thief \u2014 professional cuddling and non-sexual companionship platform (iOS, Android, admin dashboard).",
+  "scripts": {
+    "test": "npm test --prefix packages/shared",
+    "typecheck": "npm run typecheck --prefix packages/shared && npm run typecheck --prefix apps/mobile && npm run typecheck --prefix apps/admin",
+    "verify:backend": "python3 scripts/verify_backend.py",
+    "dev:admin": "npm run dev --prefix apps/admin",
+    "start:mobile": "npm start --prefix apps/mobile",
+    "install:all": "npm install --prefix packages/shared && npm install --prefix apps/mobile && npm install --prefix apps/admin"
+  },
+  "engines": {
+    "node": ">=18.17"
+  }
+}

@@ -1,0 +1,160 @@
+# Pillow Thief — Google Maps Platform Integration
+
+Google Maps is a core feature: provider discovery, service areas, meeting
+locations, travel distances/fees, and "Get Directions" for confirmed bookings.
+
+> **Nothing here is live until you complete this document.** The app detects
+> missing keys, shows an explicit notice, and falls back to server-side
+> estimates that are labelled as approximations. It never invents a route.
+
+---
+
+## 1. APIs to enable
+
+Google Cloud Console → APIs & Services → Library:
+
+| API | Used for | Where |
+| --- | --- | --- |
+| **Maps SDK for Android** | Map tiles/gestures on Android | mobile (native) |
+| **Maps SDK for iOS** | Map tiles/gestures on iOS | mobile (native) |
+| **Places API** | Address/place autocomplete + place details | mobile (autocomplete) + server (validation) |
+| **Geocoding API** | Address ↔ coordinates | server |
+| **Routes API** | Road distance + travel time | server (`booking-quote`, `booking-create`) |
+
+Billing must be enabled on the project. Set budget alerts; a discovery-heavy
+launch can generate meaningful Places traffic.
+
+---
+
+## 2. Credentials and restrictions
+
+Create **separate keys per platform and environment**. Never reuse a key.
+
+### 2.1 Android key (mobile app)
+
+- Application restriction: **Android apps** → package name
+  `app.pillowthief.mobile` + SHA-1 of your release signing certificate
+  (and the debug certificate for development builds).
+- API restriction: **Maps SDK for Android**, plus **Places API** if you enable
+  the in-app autocomplete widget.
+
+### 2.2 iOS key (mobile app)
+
+- Application restriction: **iOS apps** → bundle ID `app.pillowthief.mobile`.
+- API restriction: **Maps SDK for iOS**, plus **Places API** for autocomplete.
+
+> An iOS key is bound to a bundle ID only. Google cannot verify the signing
+> team, so treat this key as public and enforce quota/limits server-side.
+
+### 2.3 Server key (Edge Functions)
+
+- Application restriction: **None** (server IPs are not stable on Supabase).
+- API restriction: **Routes API**, **Geocoding API**, **Places API** only.
+- Store as the Edge Function secret `GOOGLE_MAPS_SERVER_KEY`.
+- **Never** ship this key in the mobile bundle or the admin dashboard.
+
+---
+
+## 3. Wiring the keys into the app
+
+`apps/mobile/app.json` already contains the plugin configuration:
+
+```json
+"ios": { "config": { "googleMapsApiKey": "IOS_KEY_HERE" } },
+"android": { "config": { "googleMaps": { "apiKey": "ANDROID_KEY_HERE" } } },
+"plugins": [
+  ["react-native-maps", {
+    "iosGoogleMapsKey": "IOS_KEY_HERE",
+    "androidGoogleMapsKey": "ANDROID_KEY_HERE"
+  }]
+]
+```
+
+Because these are native build inputs, you must rebuild:
+
+```bash
+cd apps/mobile
+npx expo prebuild --clean
+npx expo run:ios        # or run:android
+```
+
+`react-native-maps` does **not** work in Expo Go — always use a development
+build. The Explore Map screen reads the configured keys at runtime and shows a
+warning banner when none are present, so testers immediately understand why
+tiles are missing instead of assuming a broken app.
+
+---
+
+## 4. What the integration does
+
+| Feature | Implementation |
+| --- | --- |
+| Provider markers | `provider_discovery` view → `lat`/`lng` are the provider's **approximate** neighbourhood point (typically the service-area centre). Exact home coordinates are never exposed. |
+| Search this area / city selector / locate me | Region changes re-query the same backend; locating is explicit (button press) and permission denial keeps manual search working |
+| Provider preview | Bottom sheet with photo, name, verification, services, starting price, genuine rating, profile link |
+| Meeting locations | Three arrangements; house calls are validated against the provider's PostGIS service areas (`service_areas_containing`) |
+| Travel fee + distance | `booking-quote` calls Routes API (`computeRoutes`, DRIVING, traffic-aware) server-side and applies the provider's zone fee model |
+| Directions | Confirmed bookings expose coordinates to participants only; the "Get Directions" action opens the platform maps app |
+| Places autocomplete | Server-side place resolution (`resolvePlaceId`) validates and binds the chosen place_id; client-side widget optional |
+
+### Fee model
+
+```
+travel_fee = zone.travel_base_fee_minor + round(distance_km × zone.travel_per_km_minor)
+```
+
+Rejected when `distance_km > zone.max_travel_km` (`travel_out_of_range`).
+Distances always come from the server — the client never sends a distance or a
+price.
+
+---
+
+## 5. Privacy and policy compliance
+
+- **No home addresses.** Providers publish service areas (centre + radius) and
+  approved meeting locations. `provider_service_locations` holds public-ish
+  places; `booking_locations` (exact meeting point) is RLS-protected to booking
+  participants and admins only.
+- **No background location.** Only `requestForegroundPermissionsAsync()` when a
+  feature needs it. Background tracking is not implemented.
+- **Data minimisation.** We store the place_id, a label, and coordinates for the
+  booking — not the raw Google response payload. Nothing from Places/Routes is
+  cached beyond the booking record it produced.
+- **Attribution.** Google Maps attribution is rendered by the native SDK. Do not
+  cover it. Review Google's current attribution and caching terms before launch.
+- **Estimates are labelled.** Travel time/distance shown to users are marked as
+  estimates; arrival times are never guaranteed.
+
+---
+
+## 6. Testing checklist
+
+- [ ] Keys added to `app.json`, `expo prebuild` re-run, dev build installed.
+- [ ] Map tiles render on a physical Android device (Google Maps) and iPhone
+      (MapKit fallback is *not* acceptable for launch — enable Maps SDK for iOS).
+- [ ] Markers appear only for verified, published providers; suspended ones vanish.
+- [ ] Tapping a marker opens the preview sheet with genuine rating data.
+- [ ] Denying location permission keeps manual search working.
+- [ ] House-call address outside a service area returns
+      "This address is outside the provider's service area".
+- [ ] `GOOGLE_MAPS_SERVER_KEY` present → booking summary shows a realistic
+      distance and the "estimate" disclaimer; remove it → the same screen shows
+      the degraded-estimate notice.
+- [ ] Routes API quota exceeded → server logs the failure, returns the fallback
+      estimate flagged `degraded: true`, and the booking still succeeds with a
+      clearly labelled estimate.
+- [ ] Confirmed booking shows "Get Directions" only to participants.
+- [ ] Google Cloud billing alerts configured.
+
+---
+
+## 7. Cost control
+
+- Prefer `available_slots` (database) over Places calls for availability UI.
+- Debounce search input (already 300–500 ms in the UI layer) and never autocomplete
+  on every keystroke without a session token.
+- Use Autocomplete **session tokens** so a full type-then-select counts as one
+  billed session; the server-side `resolvePlaceId` call happens once at
+  booking/quote time.
+- Set a daily quota cap per API in Cloud Console; the app degrades gracefully
+  when a call fails.
