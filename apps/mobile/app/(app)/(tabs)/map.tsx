@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
 import Constants from 'expo-constants'
 import * as Location from 'expo-location'
-import MapView, { Marker, PROVIDER_GOOGLE, type Region } from 'react-native-maps'
+import MapView, { Marker, type Region } from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -157,7 +157,6 @@ export default function ExploreMapScreen() {
             ) : null}
             <MapView
               ref={mapRef}
-              provider={PROVIDER_GOOGLE}
               style={{ flex: 1 }}
               initialRegion={region}
               onRegionChangeComplete={setRegion}

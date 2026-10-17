@@ -199,7 +199,7 @@ export function Field({
   secure,
   style,
   ...input
-}: TextInputProps & { label: string; error?: string; hint?: string; secure?: boolean }) {
+}: Omit<TextInputProps, 'style'> & { label: string; error?: string; hint?: string; secure?: boolean; style?: StyleProp<ViewStyle> }) {
   const t = useTheme()
   return (
     <View style={{ marginBottom: spacing.lg, ...style }}>
