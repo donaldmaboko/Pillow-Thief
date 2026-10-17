@@ -30,13 +30,12 @@ export default function PaymentsScreen() {
         data={q.data ?? []}
         keyExtractor={(p) => p.id}
         contentContainerStyle={{ padding: spacing.lg, paddingBottom: spacing.xxxl }}
-        ListEmptyComponent={<>
+        ListEmptyComponent={
           q.isLoading ? null : q.isError ? (
             <ErrorState message="Couldn't load payments." onRetry={() => q.refetch()} />
           ) : (
             <EmptyState icon="card-outline" title="No payments yet" body="Your receipts and payment history will appear here." />
           )
-        </>
         }
         renderItem={({ item }) => {
           // deno-lint-ignore no-explicit-any

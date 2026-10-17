@@ -20,11 +20,10 @@ export default function FavouritesScreen() {
         data={favProviders}
         keyExtractor={(p) => p.provider_id}
         contentContainerStyle={{ padding: spacing.lg, paddingBottom: spacing.xxxl }}
-        ListEmptyComponent={<>
+        ListEmptyComponent={
           favs.isLoading || discovery.isLoading ? null : (
             <EmptyState icon="heart-outline" title="No saved providers" body="Tap the heart on any provider profile to keep them here." />
           )
-        </>
         }
         renderItem={({ item }) => <ProviderCard provider={item} />}
       />

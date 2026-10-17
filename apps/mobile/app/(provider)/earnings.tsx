@@ -55,13 +55,12 @@ export default function ProviderEarnings() {
             </Text>
           </>
         }
-        ListEmptyComponent={<>
+        ListEmptyComponent={
           q.isLoading ? null : q.isError ? (
             <ErrorState message="Couldn't load earnings." onRetry={() => q.refetch()} />
           ) : (
             <EmptyState icon="wallet-outline" title="No payouts yet" body="Once you complete bookings, earnings and payout records appear here." />
           )
-        </>
         }
         renderItem={({ item }) => {
           const bd = earningsBreakdown({

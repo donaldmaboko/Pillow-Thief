@@ -33,13 +33,12 @@ export default function ProviderReviews() {
         data={q.data ?? []}
         keyExtractor={(r) => r.id}
         contentContainerStyle={{ padding: spacing.lg, paddingBottom: spacing.xxxl }}
-        ListEmptyComponent={<>
+        ListEmptyComponent={
           q.isLoading ? null : q.isError ? (
             <ErrorState message="Couldn't load reviews." onRetry={() => q.refetch()} />
           ) : (
             <EmptyState icon="star-outline" title="No reviews yet" body="Genuine reviews from completed sessions appear here." />
           )
-        </>
         }
         renderItem={({ item }) => (
           <Card style={{ marginBottom: spacing.md }}>
