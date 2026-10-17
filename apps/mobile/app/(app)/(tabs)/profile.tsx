@@ -67,7 +67,7 @@ export default function ProfileScreen() {
         {isAdmin ? (
           <Card
             style={{ marginBottom: spacing.lg, backgroundColor: t.error }}
-            onPress={() => router.push('/(admin)' as never)}
+            onPress={() => router.push('/admin')}
           >
             <Text style={{ color: '#FFF1E8', fontFamily: typography.fontFamily.bold, fontSize: typography.size.lg }}>
               Admin console

@@ -17,6 +17,7 @@ harder than expected.
 | S08 | 2026-10-17 | missing | Rewind/undo. Deliberately deferred: undoing a swipe needs a server-side delete with a cooldown, not a client-side pop. |
 | X01, X05, X06 | 2026-10-17 | done | Index audit (11 new indexes), swipe rate limit (200/hour), and blocked-user exclusion on all three new paths. |
 | R13 | 2026-10-17 | done | Found by the role harness, not by the app: `donaldmaboko@gmail.com` had **no `profiles` row**, so its role was NULL and every profile join dropped it. The account predates the `on_auth_user_created` trigger. Backfilled, and `handle_new_user()` now clamps `display_name` to the 2–40 char constraint so a short local part can no longer abort a signup. |
+| R07 | 2026-10-17 | done | Admin console lives at `app/admin/*` (a real path segment), **not** `app/(admin)`. Expo Router strips `(group)` from URLs, so `app/(admin)/index.tsx` would have collided with `app/index.tsx` on `/` and `app/(admin)/settings.tsx` with `app/settings.tsx` on `/settings`. |
 | G02 | 2026-10-17 | missing | Location fuzzing. The deck currently returns a *rounded* km figure and no coordinates, which is already better than raw, but exact provider coordinates are still behind the owner/admin policy on `provider_profiles`. Phase 5 hardens this properly. |
 
 ## Deliberately not built yet
@@ -36,5 +37,5 @@ leaving them out of the feature matrix as `missing`.
   `supabase/tests/roles_fixtures.sql`.
 - **`noUncheckedIndexedAccess`** is on in this repo's tsconfig, so `arr[0]` is
   `T | undefined`. Caught at typecheck in the deck gesture handler.
-- **Route depth.** `(admin)` sits one level higher than `(app)/(tabs)`, so the
+- **Route depth.** `app/admin` sits one level higher than `app/(app)/(tabs)`, so the
   first import paths were one `../` too deep. Caught by `tsc`.

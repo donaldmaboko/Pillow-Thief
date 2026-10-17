@@ -41,11 +41,11 @@ apps/mobile/
   app/index.tsx                 # CHANGED role-based redirect
   app/(app)/(tabs)/_layout.tsx  # CHANGED tabs composed from role capabilities
   app/(app)/(tabs)/deck.tsx     # NEW  swipe deck (client)
-  app/(admin)/_layout.tsx       # NEW  admin guard + stack
-  app/(admin)/index.tsx         # NEW  admin overview
-  app/(admin)/verification.tsx  # NEW  provider application queue
-  app/(admin)/moderation.tsx    # NEW  reports / disputes / tickets
-  app/(admin)/settings.tsx      # NEW  platform settings
+  app/admin/_layout.tsx          # NEW  admin guard + stack
+  app/admin/index.tsx            # NEW  admin overview
+  app/admin/verification.tsx     # NEW  provider application queue
+  app/admin/moderation.tsx       # NEW  reports / disputes / tickets
+  app/admin/settings.tsx         # NEW  platform settings
   app/(provider)/_layout.tsx    # NEW  provider guard (fixes deep-link hole)
   app/(app)/(tabs)/profile.tsx  # CHANGED admin + provider entries
   src/features/roles/capabilities.ts   # NEW  re-export + guards (RequireRole)
@@ -97,7 +97,7 @@ truth, consumed by the tab bar, the guards and the role test suite.
 | provider | Requests · Studio · Messages · Profile |
 | admin | Console · Verification · Moderation · Settings · Profile |
 
-`app/index.tsx` redirects: `admin → /(admin)`, `provider → /(provider)/dashboard`,
+`app/index.tsx` redirects: `admin → /admin`, `provider → /(provider)/dashboard`,
 `client → /(app)/(tabs)/deck`.
 
 ---
@@ -329,7 +329,7 @@ Reads for the admin console use PostgREST `select` under the existing
 | Milestone | Contents | Screens / tables / routes |
 |---|---|---|
 | **M0** ✅ | Recon, feature matrix, this blueprint | `replica/*` |
-| **M1 — roles** | role routing, capability map, provider guard, admin console (overview, verification, moderation, settings), status-escalation fix, admin RPCs, index audit, role test suite | `(admin)/*`, `index.tsx`, `(tabs)/_layout.tsx`, `(provider)/_layout.tsx`, migration 15, RPCs 5 |
+| **M1 — roles** | role routing, capability map, provider guard, admin console (overview, verification, moderation, settings), status-escalation fix, admin RPCs, index audit, role test suite | `admin/*`, `index.tsx`, `(tabs)/_layout.tsx`, `(provider)/_layout.tsx`, migration 15, RPCs 5 |
 | **M2 — swipe** | swipes + matches + deck RPC, deck screen, matches list, realtime | `(tabs)/deck.tsx`, migration 16, RPCs 4 |
 | **M3 — paywall** | tiers, subscriptions, media, signed URLs | migration 17, RPCs 2 |
 | **M4 — messaging policy** | first-message window, expiry cron, countdown | migration 18 |

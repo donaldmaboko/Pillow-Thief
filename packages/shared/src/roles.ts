@@ -91,7 +91,7 @@ export const ROLE_LABELS: Record<UserRole, string> = {
 export const ROLE_HOME: Record<UserRole, string> = {
   client: '/(app)/(tabs)/deck',
   provider: '/(provider)/dashboard',
-  admin: '/(admin)',
+  admin: '/admin',
 }
 
 /** Tabs composed from capabilities, in display order. */

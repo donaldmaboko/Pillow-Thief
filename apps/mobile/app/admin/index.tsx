@@ -47,13 +47,13 @@ export default function AdminOverview() {
                 label="Applications"
                 value={m.applications_pending}
                 tone={m.applications_pending > 0 ? 'warn' : 'ok'}
-                onPress={() => router.push('/(admin)/verification')}
+                onPress={() => router.push('/admin/verification')}
               />
               <Stat
                 label="Open reports"
                 value={m.open_reports}
                 tone={m.open_reports > 0 ? 'danger' : 'ok'}
-                onPress={() => router.push('/(admin)/moderation')}
+                onPress={() => router.push('/admin/moderation')}
               />
             </View>
             <View style={{ flexDirection: 'row', gap: spacing.md, marginTop: spacing.md }}>
@@ -61,13 +61,13 @@ export default function AdminOverview() {
                 label="Disputes"
                 value={m.open_disputes}
                 tone={m.open_disputes > 0 ? 'danger' : 'ok'}
-                onPress={() => router.push('/(admin)/moderation')}
+                onPress={() => router.push('/admin/moderation')}
               />
               <Stat
                 label="Tickets"
                 value={m.open_tickets}
                 tone={m.open_tickets > 0 ? 'warn' : 'ok'}
-                onPress={() => router.push('/(admin)/moderation')}
+                onPress={() => router.push('/admin/moderation')}
               />
             </View>
 

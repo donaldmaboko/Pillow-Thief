@@ -1,21 +1,21 @@
 id,area,feature,priority,pattern_source,state,phase,notes
 R01,roles,client role sees discovery/book/chat surfaces,must,own,done,0,existing
 R02,roles,provider role sees provider studio,must,own,done,0,existing
-R03,roles,admin role sees an admin console in the mobile app,must,own,done,1,THE reported bug - app/(admin) group
+R03,roles,admin role sees an admin console in the mobile app,must,own,done,1,THE reported bug - app/admin group
 R04,roles,role-based home routing (index.tsx),must,own,done,1,ROLE_HOME map
 R05,roles,role-based tab bar composition,must,own,done,1,tabs composed from capabilities
 R06,roles,route guard on (provider) group,must,own,done,1,(provider)/_layout.tsx
-R07,roles,route guard on (admin) group,must,own,done,1,RoleGate on (admin)/_layout
+R07,roles,route guard on admin group,must,own,done,1,RoleGate on admin/_layout
 R08,roles,admin-gated RPCs so mobile admins can act,must,own,done,1,admin_decide_application / admin_set_provider_status / admin_metrics
 R09,roles,fix provider_applications status escalation,must,own,done,1,protect_application_status trigger
 R10,roles,consistent admin write grants across provider tables,should,own,done,1,4 policies added
 R11,roles,capability map shared between app and tests,should,own,done,1,packages/shared/src/roles.ts
 R12,roles,role matrix test suite,must,own,done,1,scripts/verify_roles.mjs - 17/17 against hosted
 R13,roles,backfill profiles for auth users that predate the signup trigger,must,own,done,1,owner account had role NULL - migration 17_000003
-A01,admin,mobile admin overview metrics,must,own,done,1,(admin)/index.tsx
-A02,admin,mobile verification queue approve/reject,must,own,done,1,(admin)/verification.tsx
-A03,admin,mobile moderation (reports/disputes/tickets),must,own,done,1,(admin)/moderation.tsx
-A04,admin,mobile platform settings read/write,should,own,done,1,(admin)/settings.tsx
+A01,admin,mobile admin overview metrics,must,own,done,1,admin/index.tsx
+A02,admin,mobile verification queue approve/reject,must,own,done,1,admin/verification.tsx
+A03,admin,mobile moderation (reports/disputes/tickets),must,own,done,1,admin/moderation.tsx
+A04,admin,mobile platform settings read/write,should,own,done,1,admin/settings.tsx
 A05,admin,admin audit trail view,should,own,missing,1,audit_logs is service-role only - needs an admin RPC
 S01,swipe,swipes table with canonical pair guard,must,Tinder,done,2,unique (actor_id,target_id)
 S02,swipe,deck RPC excluding swiped/blocked/self,must,Tinder,done,2,discovery_deck

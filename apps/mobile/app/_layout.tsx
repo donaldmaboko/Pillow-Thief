@@ -76,7 +76,7 @@ export default function RootLayout() {
           <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: theme.bg } }}>
             <Stack.Screen name="(auth)" />
             <Stack.Screen name="(app)" />
-            <Stack.Screen name="(admin)" />
+            <Stack.Screen name="admin" />
             <Stack.Screen name="matches" />
             <Stack.Screen name="provider/[id]" options={{ presentation: 'card' }} />
             <Stack.Screen name="booking/new/[providerId]" options={{ presentation: 'modal' }} />

@@ -115,7 +115,7 @@ existing in PostgreSQL, and missing UUID casts in the seed).
 5. Bookings list filter by status; totals and commission match the ledger.
 6. Generate payouts for a period; re-running is idempotent.
 7. Resolve a report and a dispute with notes.
-8. Deep-link a client to `/(provider)/dashboard` and to `/(admin)` → both
+8. Deep-link a client to `/(provider)/dashboard` and to `/admin` → both
    redirect. The database refuses the same actions independently.
 
 ## 5. Security test checklist
