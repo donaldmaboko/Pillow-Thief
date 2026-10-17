@@ -9,6 +9,7 @@
 | Backend rule verification | `/tmp/ptvenv/bin/python scripts/verify_backend.py` | 28 assertions against **real PostgreSQL**: double-booking exclusion, availability windows, server-side price authority, privilege-escalation guards, RLS isolation, promo limits, review eligibility, audit logging |
 | Edge Function tests (Deno) | `cd supabase/functions && deno task test` | Webhook signature verification (valid / forged / tampered / malformed), gateway selection refuses unwired providers, routing fallback is labelled as an estimate (8 assertions) |
 | Edge Function type check | `deno check --config deno.json */main.ts` | All nine functions compile under strict Deno/TypeScript |
+| Role matrix (hosted) | `node scripts/verify_roles.mjs` | Every role's real permissions against the hosted database: client, provider and admin paths, positive and negative. Creates and removes its own `qa.*` fixtures. |
 | Mobile bundle check | `cd apps/mobile && npm run bundle:check` | Metro/Hermes produce a production bundle — catches unresolved imports and missing assets that type-checking cannot |
 | Admin production build | `cd apps/admin && npx next build` | Compiles, type-checks and renders all routes |
 
@@ -41,6 +42,25 @@ PASS  clients cannot write payment rows
 PASS  duplicate review for same booking rejected
 PASS  booking changes are audit-logged
 ```
+
+### What the role matrix suite asserts
+
+```
+admin    PASS  admin_metrics returns the console contract
+admin    PASS  approve an application -> provider role + provider profile provisioned
+admin    PASS  publish -> the provider becomes publicly visible
+admin    PASS  unknown admin action is rejected
+client   PASS  the deck returns published, verified providers
+client   PASS  a like is recorded without revealing a match (double-blind)
+client   FAIL-expected  admin_metrics is refused
+client   FAIL-expected  own role cannot be escalated
+client   FAIL-expected  an application cannot be submitted as 'verified'
+provider PASS  a reverse like creates exactly one match and one conversation
+provider PASS  both sides see the match
+provider PASS  unmatch removes it for both sides
+```
+
+Negative assertions expect an error; a silent success there is a security bug.
 
 Re-run it after **every** migration change — it caught three real bugs during
 development (a PL/pgSQL loop-target error, `round(double precision, int)` not
@@ -87,13 +107,16 @@ existing in PostgreSQL, and missing UUID casts in the seed).
 
 ## 4. Manual QA — admin journeys
 
-1. Sign in as admin; non-admin accounts are rejected.
-2. Overview metrics match direct SQL counts (`select count(*) …`).
+1. Sign in as admin **in the mobile app** → lands on the admin console, not the
+   client home. A client or provider signing in never sees the console.
+2. Console metrics match direct SQL counts (`select count(*) …`).
 3. Approve / reject / request-more-info an application → audit log entries exist.
 4. Suspend a provider → disappears from discovery immediately; reinstate restores.
 5. Bookings list filter by status; totals and commission match the ledger.
 6. Generate payouts for a period; re-running is idempotent.
 7. Resolve a report and a dispute with notes.
+8. Deep-link a client to `/(provider)/dashboard` and to `/(admin)` → both
+   redirect. The database refuses the same actions independently.
 
 ## 5. Security test checklist
 

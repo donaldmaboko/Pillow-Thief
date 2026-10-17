@@ -4,6 +4,8 @@ import type { Profile, UserRole } from '@pillow-thief/shared'
 interface SessionState {
   userId: string | null
   profile: Profile | null
+  /** Current role, derived from the profile. Null before the profile loads. */
+  role: UserRole | null
   isProvider: boolean
   isAdmin: boolean
   hydrated: boolean
@@ -15,16 +17,21 @@ interface SessionState {
 export const useSession = create<SessionState>((set) => ({
   userId: null,
   profile: null,
+  role: null,
   isProvider: false,
   isAdmin: false,
   hydrated: false,
-  setSession: (userId, profile) =>
+  setSession: (userId, profile) => {
+    const role = (profile?.role as UserRole | undefined) ?? null
     set({
       userId,
       profile,
-      isProvider: (profile?.role as UserRole | undefined) === 'provider',
-      isAdmin: (profile?.role as UserRole | undefined) === 'admin',
-    }),
+      role,
+      isProvider: role === 'provider',
+      isAdmin: role === 'admin',
+    })
+  },
   setHydrated: () => set({ hydrated: true }),
-  signOut: () => set({ userId: null, profile: null, isProvider: false, isAdmin: false }),
+  signOut: () =>
+    set({ userId: null, profile: null, role: null, isProvider: false, isAdmin: false }),
 }))

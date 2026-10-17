@@ -1,0 +1,59 @@
+id,area,feature,priority,pattern_source,state,phase,notes
+R01,roles,client role sees discovery/book/chat surfaces,must,own,done,0,existing
+R02,roles,provider role sees provider studio,must,own,done,0,existing
+R03,roles,admin role sees an admin console in the mobile app,must,own,done,1,THE reported bug - app/(admin) group
+R04,roles,role-based home routing (index.tsx),must,own,done,1,ROLE_HOME map
+R05,roles,role-based tab bar composition,must,own,done,1,tabs composed from capabilities
+R06,roles,route guard on (provider) group,must,own,done,1,(provider)/_layout.tsx
+R07,roles,route guard on (admin) group,must,own,done,1,RoleGate on (admin)/_layout
+R08,roles,admin-gated RPCs so mobile admins can act,must,own,done,1,admin_decide_application / admin_set_provider_status / admin_metrics
+R09,roles,fix provider_applications status escalation,must,own,done,1,protect_application_status trigger
+R10,roles,consistent admin write grants across provider tables,should,own,done,1,4 policies added
+R11,roles,capability map shared between app and tests,should,own,done,1,packages/shared/src/roles.ts
+R12,roles,role matrix test suite,must,own,done,1,scripts/verify_roles.mjs - 17/17 against hosted
+R13,roles,backfill profiles for auth users that predate the signup trigger,must,own,done,1,owner account had role NULL - migration 17_000003
+A01,admin,mobile admin overview metrics,must,own,done,1,(admin)/index.tsx
+A02,admin,mobile verification queue approve/reject,must,own,done,1,(admin)/verification.tsx
+A03,admin,mobile moderation (reports/disputes/tickets),must,own,done,1,(admin)/moderation.tsx
+A04,admin,mobile platform settings read/write,should,own,done,1,(admin)/settings.tsx
+A05,admin,admin audit trail view,should,own,missing,1,audit_logs is service-role only - needs an admin RPC
+S01,swipe,swipes table with canonical pair guard,must,Tinder,done,2,unique (actor_id,target_id)
+S02,swipe,deck RPC excluding swiped/blocked/self,must,Tinder,done,2,discovery_deck
+S03,swipe,record_swipe RPC with double-blind match,must,Tinder,done,2,
+S04,swipe,match creates a conversation atomically,must,Tinder,done,2,same transaction as the match
+S05,swipe,swipe deck screen with cards and gestures,must,Tinder,done,2,(tabs)/deck.tsx + SwipeDeck
+S06,swipe,matches list screen,must,Tinder,done,2,app/matches.tsx
+S07,swipe,realtime match notifications,must,Tinder,done,2,matches added to supabase_realtime
+S08,swipe,undo last pass (rewind),could,Tinder,missing,2,
+S09,swipe,super-like / priority interest,could,Tinder,done,2,swipe up or the star button
+G01,geo,distance-sorted deck using postgis,must,Grindr,done,2,discovery_deck orders by st_distance
+G02,geo,approximate-location fuzzing to stop spoof/scrape,must,Grindr,missing,5,privacy - the deck returns rounded km only today
+G03,geo,presence + last_seen_at,must,Grindr,missing,5,
+G04,geo,"nearby grid, low-latency refresh",should,Grindr,partial,5,map exists; no presence refresh
+B01,messaging,first-message window policy per provider,must,Bumble,missing,4,
+B02,messaging,expiry cron for unstarted conversations,must,Bumble,missing,4,
+B03,messaging,countdown UI in chat header,must,Bumble,missing,4,
+B04,messaging,message delivery latency + realtime fallback poll,should,Grindr,partial,4,realtime on messages exists; no fallback poll
+B05,messaging,conditional initiator rule configurable per match,should,Bumble,missing,4,
+O01,paywall,subscription tiers table,must,OnlyFans,missing,3,
+O02,paywall,active subscription state on profile,must,OnlyFans,missing,3,
+O03,paywall,media assets with visibility enum,must,OnlyFans,missing,3,
+O04,paywall,signed-URL issue RPC with entitlement check,must,OnlyFans,missing,3,
+O05,paywall,public teaser vs locked separation,must,OnlyFans,missing,3,
+O06,paywall,paywall bypass regression tests,must,OnlyFans,missing,3,
+Q01,questionnaire,question bank table,must,OkCupid,missing,6,
+Q02,questionnaire,answers with importance weights,must,OkCupid,missing,6,
+Q03,questionnaire,compatibility score function,must,OkCupid,missing,6,
+Q04,questionnaire,hard dealbreakers exclude from deck,must,OkCupid,missing,6,
+Q05,questionnaire,compatibility badge on cards,should,OkCupid,missing,6,
+H01,community,community posts feed,must,HER,missing,7,
+H02,community,local events + RSVP,must,HER,missing,7,
+H03,community,identity/orientation tags,must,HER,missing,7,
+H04,community,moderation queue for feed content,must,HER,missing,7,
+H05,community,inclusive language + orientation mapping,should,HER,missing,7,
+X01,perf,indexes on every fk + filter/sort column,must,own,done,1,8 indexes added in migration 15 plus 3 in 16
+X02,perf,no dynamic array reallocation in hot paths,should,own,done,1,deck uses refs; handlership and committed set, no per-frame allocs
+X03,perf,bounded queries (explicit limits + keyset pagination),must,own,done,1,every new query has an explicit limit; deck capped at 50
+X04,perf,constraint-validated writes server-side,must,own,done,1,new tables checked; RPCs validate every input
+X05,safety,rate limiting on swipes/likes,must,Grindr,done,2,200 swipes/hour enforced in record_swipe
+X06,safety,blocked users excluded everywhere,must,own,done,2,deck + swipe + who-liked-me all check is_blocked_between
