@@ -18,12 +18,18 @@ declare
   v_admin uuid := '11111111-aaaa-4000-8000-000000000001'::uuid;
   v_pw text := extensions.crypt('Password123!', extensions.gen_salt('bf'));
 begin
+  -- NOTE: email_change must be set to '' (empty string), never left NULL.
+  -- Hosted Supabase GoTrue scans this column into a non-nullable string, so a
+  -- NULL here makes *all* sign-in attempts fail with HTTP 500
+  -- "Database error querying schema". (Local Supabase defaults it to '', which
+  -- is why this only bites on hosted projects.)
   insert into auth.users
     (id, instance_id, email, encrypted_password, email_confirmed_at,
-     confirmation_token, recovery_token, email_change_token_new, raw_app_meta_data,
+     confirmation_token, recovery_token, email_change, email_change_token_new,
+     raw_app_meta_data,
      raw_user_meta_data, aud, role, created_at, updated_at, last_sign_in_at)
   values
-    (v_admin, '00000000-0000-0000-0000-000000000000'::uuid, 'admin@pillowthief.local', v_pw, now(), '', '', '',
+    (v_admin, '00000000-0000-0000-0000-000000000000'::uuid, 'admin@pillowthief.local', v_pw, now(), '', '', '', '',
      '{"provider":"email","providers":["email"]}', '{"display_name":"Admin","role":"admin"}', 'authenticated', 'authenticated', now(), now(), now())
   on conflict (id) do nothing;
 
