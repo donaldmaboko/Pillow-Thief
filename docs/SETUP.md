@@ -156,21 +156,17 @@ rejected both by the dashboard and by every admin Edge Function.
 
 ---
 
-## 6. Development accounts (seed data)
+## 6. Seed account (seed data)
 
-`supabase/seed.sql` is **development-only**. Password for all accounts:
-`Password123!`
+`supabase/seed.sql` creates a single administrator. Password: `Password123!`
 
 | Email | Role | Purpose |
 | --- | --- | --- |
 | `admin@pillowthief.local` | admin | Dashboard, verification queue |
-| `lerato@pillowthief.local` | client | Books sessions |
-| `thabo@pillowthief.local` | provider (verified, published) | Discovery, bookings |
-| `naledi@pillowthief.local` | provider (verified, published) | Public-meeting sessions |
-| `kabelo@pillowthief.local` | applicant (pending) | Admin verification demo |
 
-Seed data is fictional test data. It is never loaded into staging or production
-by the deploy scripts, and the UI labels simulated payments as sandbox.
+Every other account is created by signing up in the app. Change the seeded
+password after the first sign-in on any shared environment; the UI labels
+simulated payments as sandbox.
 
 ---
 

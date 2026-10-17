@@ -137,4 +137,5 @@ existing in PostgreSQL, and missing UUID casts in the seed).
 - [ ] Google Maps verified with production-restricted keys.
 - [ ] Payment gateway sandbox journey verified; live keys only after PAYMENTS.md
       sign-off.
-- [ ] No test/demo data in production (`kabelo@pillowthief.local` must not exist).
+- [ ] Bootstrap admin password changed (no `Password123!` login works) and no
+      other demo accounts exist.
