@@ -76,8 +76,9 @@ truth, consumed by the tab bar, the guards and the role test suite.
 
 | Capability | client | provider | admin |
 |---|---|---|---|
-| `discover.swipe` | ✅ | ✅ | ✅ |
-| `discover.search` / `map` | ✅ | ✅ | ✅ |
+| `discover.swipe` | ✅ | — | ✅ |
+| `discover.search` / `map` | ✅ | — | ✅ |
+| `matches.view` | ✅ | ✅ | ✅ |
 | `book.create` | ✅ | — | — |
 | `book.receive` | — | ✅ | — |
 | `provider.studio` | — | ✅ | — |
@@ -94,8 +95,14 @@ truth, consumed by the tab bar, the guards and the role test suite.
 | Role | Tabs |
 |---|---|
 | client | Home · Cuddle(deck) · Discover · Map · Bookings · Profile |
-| provider | Requests · Studio · Messages · Profile |
+| provider | Requests · Profile (home is the Studio dashboard, not a tab) |
 | admin | Console · Verification · Moderation · Settings · Profile |
+
+Providers deliberately have no discovery surfaces. `discovery_deck` only returns
+providers, so a provider browsing it could only ever see competitors or an empty
+deck. Their route into a match is `list_who_liked_me` — the "Likes & matches"
+card on the Studio dashboard — and `record_swipe` already resolves the
+provider/client sides from the caller's role when they like back.
 
 `app/index.tsx` redirects: `admin → /admin`, `provider → /(provider)/dashboard`,
 `client → /(app)/(tabs)/deck`.

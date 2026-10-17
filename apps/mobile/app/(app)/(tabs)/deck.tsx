@@ -11,10 +11,11 @@ import { useDeck, type Coords } from '../../../src/features/swipe/useDeck'
 import { useSwipe } from '../../../src/features/swipe/useSwipe'
 import { useMatchesRealtime, useWhoLikedMe } from '../../../src/features/matches/useMatches'
 import { Button, CardSkeleton, EmptyState, ErrorState } from '../../../src/components/ui'
+import { RoleGate } from '../../../src/features/roles/RoleGate'
 import { errorMessage } from '../../../src/lib/api'
 import { spacing, typography, useTheme } from '../../../src/theme'
 
-export default function DeckScreen() {
+function DeckScreen() {
   const t = useTheme()
   const router = useRouter()
   const qc = useQueryClient()
@@ -133,5 +134,18 @@ export default function DeckScreen() {
         )}
       </View>
     </SafeAreaView>
+  )
+}
+
+/**
+ * The deck is a discovery surface. Providers are excluded by capability — their
+ * route into a match is the inbound likes list, not a blind deck over other
+ * providers. The guard also closes the `/(app)/(tabs)/deck` deep link.
+ */
+export default function DeckRoute() {
+  return (
+    <RoleGate capability="discover.swipe">
+      <DeckScreen />
+    </RoleGate>
   )
 }

@@ -66,6 +66,25 @@ Re-run it after **every** migration change — it caught three real bugs during
 development (a PL/pgSQL loop-target error, `round(double precision, int)` not
 existing in PostgreSQL, and missing UUID casts in the seed).
 
+### Sample provider fixture (empty-deck workaround)
+
+The project ships with only real accounts, so a fresh database has **no
+providers** and the deck, the verification queue and the map all render empty
+states. To exercise the swipe → match → chat loop there is one opt-in fixture:
+
+```powershell
+# create one verified, published provider in Gaborone
+supabase db query --linked -f supabase/tests/sample_provider.sql
+
+# sign in as  test.provider@pillowthief.local / Provider123!
+
+# remove it and everything hanging off it
+supabase db query --linked -f supabase/tests/sample_provider_cleanup.sql
+```
+
+It is idempotent — safe to re-run. It is **not** part of `seed.sql`, so it never
+reaches a production project.
+
 ---
 
 ## 2. Manual QA — client journey (run on iOS **and** Android)
@@ -104,6 +123,12 @@ existing in PostgreSQL, and missing UUID casts in the seed).
 5. Receive a request → accept (confirmed) or decline (client refunded 100%).
 6. Mark session complete → earnings reflect gross − commission − refunds.
 7. Add an availability exception → the slot disappears from client calendars.
+8. **Likes & matches** — the Studio dashboard's *Likes & matches* card opens the
+   inbound-like list. Providers deliberately have **no** Cuddle deck (the deck
+   only returns providers, so for a provider it could only ever be empty or show
+   competitors). Liking a client back creates the match and the conversation.
+   The Cuddle tab must not appear in a provider's tab bar, and deep-linking
+   `/(app)/(tabs)/deck` must bounce back to the Studio.
 
 ## 4. Manual QA — admin journeys
 

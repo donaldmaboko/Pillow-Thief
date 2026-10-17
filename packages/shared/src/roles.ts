@@ -43,12 +43,14 @@ export const ROLE_CAPABILITIES: Record<UserRole, readonly RoleCapability[]> = {
     'chat.participate',
     'safety.report',
   ],
-  // A provider receives bookings and runs the studio. Providers can also browse
-  // and swipe, so they can match with the clients who liked them.
+  // A provider receives bookings and runs the studio. Providers deliberately get
+  // NO discovery surfaces: the deck only ever returns providers, so a provider
+  // browsing it would either see competitors or an empty deck. They respond to
+  // inbound interest instead — `list_who_liked_me` puts the clients who liked
+  // them in front of them, and liking one back creates the match and the
+  // conversation (see `record_swipe`, which resolves the provider/client sides
+  // from the caller's role).
   provider: [
-    'discover.swipe',
-    'discover.search',
-    'discover.map',
     'matches.view',
     'book.receive',
     'provider.studio',

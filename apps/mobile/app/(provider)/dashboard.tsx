@@ -149,6 +149,7 @@ export default function ProviderDashboard() {
 
         {/* Management shortcuts */}
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md, marginTop: spacing.lg }}>
+          <MgmtCard icon="heart-outline" label="Likes & matches" onPress={() => router.push('/matches')} />
           <MgmtCard icon="pricetag-outline" label="Services & pricing" onPress={() => router.push('/(provider)/services')} />
           <MgmtCard icon="calendar-outline" label="Availability" onPress={() => router.push('/(provider)/availability')} />
           <MgmtCard icon="wallet-outline" label="Earnings & payouts" onPress={() => router.push('/(provider)/earnings')} />

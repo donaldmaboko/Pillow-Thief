@@ -9,11 +9,16 @@ import { useMatches, useWhoLikedMe } from '../src/features/matches/useMatches'
 import { useSwipe } from '../src/features/swipe/useSwipe'
 import { errorMessage } from '../src/lib/api'
 import { spacing, typography, useTheme } from '../src/theme'
+import { useSession } from '../src/stores/session'
 
 export default function MatchesScreen() {
   const t = useTheme()
   const router = useRouter()
   const qc = useQueryClient()
+  const role = useSession((s) => s.role)
+  // Providers have no deck (discovery only ever returns providers), so their
+  // route into a match is the inbound like list above — never "go swipe".
+  const isProvider = role === 'provider'
 
   const matches = useMatches()
   const likes = useWhoLikedMe()
@@ -72,9 +77,15 @@ export default function MatchesScreen() {
           <EmptyState
             icon="heart-outline"
             title="No matches yet"
-            body="Swipe on the Cuddle deck. When someone likes you back you can start chatting straight away."
-            action="Open the deck"
-            onAction={() => router.replace('/(app)/(tabs)/deck')}
+            body={
+              isProvider
+                ? 'When a client likes you they appear under “Liked you” above. Like them back and you can start chatting straight away.'
+                : 'Swipe on the Cuddle deck. When someone likes you back you can start chatting straight away.'
+            }
+            action={isProvider ? 'Back to your studio' : 'Open the deck'}
+            onAction={() =>
+              isProvider ? router.replace('/(provider)/dashboard') : router.replace('/(app)/(tabs)/deck')
+            }
           />
         ) : (
           matches.data?.map((m) => (
