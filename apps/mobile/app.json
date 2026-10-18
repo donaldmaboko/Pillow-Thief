@@ -20,9 +20,6 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Pillow Thief uses your location to find cuddle providers near you and to set meeting locations. You can always search manually instead.",
         "UIBackgroundModes": ["remote-notification"]
-      },
-      "config": {
-        "googleMapsApiKey": ""
       }
     },
     "android": {
@@ -31,12 +28,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#F48FB1"
       },
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "POST_NOTIFICATIONS"],
-      "config": {
-        "googleMaps": {
-          "apiKey": ""
-        }
-      }
+      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "POST_NOTIFICATIONS"]
     },
     "plugins": [
       "expo-router",
@@ -53,13 +45,7 @@
           "locationWhenInUsePermission": "Pillow Thief uses your location to find cuddle providers near you and to set meeting locations. You can always search manually instead."
         }
       ],
-      [
-        "react-native-maps",
-        {
-          "iosGoogleMapsKey": "",
-          "androidGoogleMapsKey": ""
-        }
-      ]
+      "react-native-maps"
     ],
     "experiments": {
       "typedRoutes": true

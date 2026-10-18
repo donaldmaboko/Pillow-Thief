@@ -57,31 +57,56 @@ Create **separate keys per platform and environment**. Never reuse a key.
 
 ## 3. Wiring the keys into the app
 
-`apps/mobile/app.json` already contains the plugin configuration:
+Keys are **build-time native inputs**, so they live in the environment and are
+never committed:
 
-```json
-"ios": { "config": { "googleMapsApiKey": "IOS_KEY_HERE" } },
-"android": { "config": { "googleMaps": { "apiKey": "ANDROID_KEY_HERE" } } },
-"plugins": [
-  ["react-native-maps", {
-    "iosGoogleMapsKey": "IOS_KEY_HERE",
-    "androidGoogleMapsKey": "ANDROID_KEY_HERE"
-  }]
-]
+```bash
+# apps/mobile/.env
+GOOGLE_MAPS_ANDROID_KEY=AIza...   # Maps SDK for Android
+GOOGLE_MAPS_IOS_KEY=AIza...       # Maps SDK for iOS (optional; iOS falls back to Apple Maps)
 ```
 
-Because these are native build inputs, you must rebuild:
+`apps/mobile/app.config.ts` reads them and writes every place the native SDKs
+look:
+
+| Target | Field |
+| --- | --- |
+| AndroidManifest meta-data | `android.config.googleMaps.apiKey` |
+| Info.plist `GMSApiKey` | `ios.config.googleMapsApiKey` |
+| `react-native-maps` config plugin | `androidGoogleMapsKey` / `iosGoogleMapsKey` |
+
+Check what the native build will actually receive *before* building:
 
 ```bash
 cd apps/mobile
-npx expo prebuild --clean
-npx expo run:ios        # or run:android
+npx expo config --type prebuild --json   # inspect ios.config / android.config
 ```
 
-`react-native-maps` does **not** work in Expo Go — always use a development
-build. The Explore Map screen reads the configured keys at runtime and shows a
-warning banner when none are present, so testers immediately understand why
-tiles are missing instead of assuming a broken app.
+Then rebuild — these are native inputs, so a JS reload is not enough:
+
+```bash
+npx expo run:android      # or run:ios
+```
+
+### Expo Go cannot show Google Maps
+
+**Google Maps does not work in Expo Go, and no API key will change that.** Expo
+Go stopped shipping a usable Google Maps key in SDK 52
+([changelog](https://expo.dev/changelog/2024-11-12-sdk-52#deprecations)). On
+Android `<MapView>` still mounts, but every tile request is rejected
+(`Authorization failure. Please see .../android-sdk/start` in LogCat) and the
+user sees a blank grey rectangle with a Google logo. This is an Expo Go
+limitation, not a bug in this app.
+
+| Platform | Expo Go | Development build |
+| --- | --- | --- |
+| Android | ❌ blank tiles, no workaround | ✅ Google Maps with your key |
+| iOS | ✅ Apple Maps (MapKit — needs no key) | ✅ Apple Maps, or Google Maps with a key |
+
+`src/lib/maps.ts` encodes exactly this. The Explore Map screen only mounts
+`<MapView>` when tiles can really render — on iOS in Expo Go, and on Android in
+a development build that has a key. Anywhere else it shows an accurate notice
+plus the real provider list, rather than a grey box that looks like a crash.
 
 ---
 
@@ -129,9 +154,11 @@ price.
 
 ## 6. Testing checklist
 
-- [ ] Keys added to `app.json`, `expo prebuild` re-run, dev build installed.
+- [ ] `GOOGLE_MAPS_ANDROID_KEY` / `GOOGLE_MAPS_IOS_KEY` set in `apps/mobile/.env`;
+      `npx expo config --type prebuild --json` shows them; dev build installed.
 - [ ] Map tiles render on a physical Android device (Google Maps) and iPhone
-      (MapKit fallback is *not* acceptable for launch — enable Maps SDK for iOS).
+      (Apple Maps is fine on iOS; enable Maps SDK for iOS only if you need
+      Google tiles there).
 - [ ] Markers appear only for verified, published providers; suspended ones vanish.
 - [ ] Tapping a marker opens the preview sheet with genuine rating data.
 - [ ] Denying location permission keeps manual search working.

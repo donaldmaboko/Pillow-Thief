@@ -1,8 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react'
 import { Alert, Dimensions, Pressable, ScrollView, Text, TextInput, View } from 'react-native'
-import Constants from 'expo-constants'
 import * as Location from 'expo-location'
-import MapView, { Marker, type Region } from 'react-native-maps'
+import MapView, { Marker, PROVIDER_DEFAULT, PROVIDER_GOOGLE, type Region } from 'react-native-maps'
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -10,6 +9,7 @@ import { Avatar, Chip, RatingStars, SafetyAlert, VerifiedBadge } from '../../../
 import { ProviderCard } from '../../../src/components/ProviderCard'
 import { radius, shadows, spacing, typography, useTheme } from '../../../src/theme'
 import { useDiscovery, type DiscoveryProvider } from '../../../src/lib/queries'
+import { getMapsAvailability, mapsBlockedNotice } from '../../../src/lib/maps'
 import { fmtMoney } from '../../../src/lib/format'
 
 // Gaborone CBD — the launch city.
@@ -42,9 +42,8 @@ export default function ExploreMapScreen() {
     [discovery.data],
   )
 
-  const mapsKeyConfigured =
-    Boolean(Constants.expoConfig?.ios?.config?.googleMapsApiKey) ||
-    Boolean(Constants.expoConfig?.android?.config?.googleMaps?.apiKey)
+  const maps = getMapsAvailability()
+  const notice = mapsBlockedNotice(maps)
 
   const locateMe = async () => {
     try {
@@ -144,20 +143,28 @@ export default function ExploreMapScreen() {
               (discovery.data ?? []).map((p) => <ProviderCard key={p.provider_id} provider={p} />)
             )}
           </ScrollView>
+        ) : !maps.nativeTiles ? (
+          // Mounting <MapView> here would paint a blank grey box: on Android in
+          // Expo Go Google rejects every tile request, and a missing key in a
+          // dev build does the same. Show the notice and the real provider list
+          // instead, so the screen still does its job.
+          <ScrollView contentContainerStyle={{ padding: spacing.lg, paddingBottom: 160 }}>
+            <SafetyAlert tone="warning" title={notice.title} body={notice.body} />
+            <View style={{ height: spacing.lg }} />
+            {providers.length === 0 ? (
+              <Text style={{ color: t.textMuted, textAlign: 'center', marginTop: spacing.xl }}>
+                No providers found in this area yet.
+              </Text>
+            ) : (
+              providers.map((p) => <ProviderCard key={p.provider_id} provider={p} />)
+            )}
+          </ScrollView>
         ) : (
           <View style={{ flex: 1 }}>
-            {!mapsKeyConfigured ? (
-              <View style={{ padding: spacing.lg }}>
-                <SafetyAlert
-                  tone="warning"
-                  title="Google Maps key not configured"
-                  body="Live tiles need a development build with your Google Maps API keys (see docs/GOOGLE_MAPS.md). Provider locations below are approximate and come from the backend."
-                />
-              </View>
-            ) : null}
             <MapView
               ref={mapRef}
               style={{ flex: 1 }}
+              provider={maps.provider === 'google' ? PROVIDER_GOOGLE : PROVIDER_DEFAULT}
               initialRegion={region}
               onRegionChangeComplete={setRegion}
               showsUserLocation={false}
