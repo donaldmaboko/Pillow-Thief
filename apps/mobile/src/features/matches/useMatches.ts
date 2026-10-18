@@ -37,16 +37,26 @@ export function useMatchesRealtime() {
   useEffect(() => {
     if (!userId) return
     const sb = requireSupabase()
+    // Unique topic per subscription, deliberately.
+    //
+    // supabase-js keys its channels by topic and `channel(topic)` RETURNS the
+    // existing channel when the topic matches. `removeChannel()` is async, so
+    // anything that re-runs this effect before its promise settles — Fast
+    // Refresh, session hydration, a tab remount — would be handed the previous,
+    // still-subscribed channel and the next `.on()` would throw
+    // "cannot add `postgres_changes` callbacks ... after `subscribe()`".
+    // A unique topic makes that collision impossible.
+    const topic = `matches-${userId}-${Math.random().toString(36).slice(2, 10)}`
     const channel = sb
-      .channel(`matches-${userId}`)
+      .channel(topic)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'matches' }, () => {
-        qc.invalidateQueries({ queryKey: ['matches'] })
-        qc.invalidateQueries({ queryKey: ['who-liked-me'] })
+        void qc.invalidateQueries({ queryKey: ['matches'] })
+        void qc.invalidateQueries({ queryKey: ['who-liked-me'] })
       })
       .subscribe()
 
     return () => {
-      sb.removeChannel(channel)
+      void sb.removeChannel(channel)
     }
   }, [userId, qc])
 }
