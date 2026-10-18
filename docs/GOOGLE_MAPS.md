@@ -66,21 +66,35 @@ GOOGLE_MAPS_ANDROID_KEY=AIza...   # Maps SDK for Android
 GOOGLE_MAPS_IOS_KEY=AIza...       # Maps SDK for iOS (optional; iOS falls back to Apple Maps)
 ```
 
-`apps/mobile/app.config.ts` reads them and writes every place the native SDKs
-look:
+`apps/mobile/app.config.ts` reads them and passes them to the `react-native-maps`
+config plugin — which is the only thing that writes native config. **The option
+names must be exact, because a typo fails silently:**
 
-| Target | Field |
+| Option | Writes |
 | --- | --- |
-| AndroidManifest meta-data | `android.config.googleMaps.apiKey` |
-| Info.plist `GMSApiKey` | `ios.config.googleMapsApiKey` |
-| `react-native-maps` config plugin | `androidGoogleMapsKey` / `iosGoogleMapsKey` |
+| `androidGoogleMapsApiKey` | AndroidManifest `<meta-data android:name="com.google.android.geo.API_KEY" …>` |
+| `iosGoogleMapsApiKey` | Info.plist `GMSApiKey`, plus the Google Maps CocoaPod |
 
-Check what the native build will actually receive *before* building:
+`androidGoogleMapsKey` / `iosGoogleMapsKey` (no `Api`) are **not** read. That
+misspelling shipped in this repo originally and was worse than useless: because
+declaring the plugin at all suppresses Expo's built-in fallback
+(`@expo/prebuild-config` → `createLegacyPlugin` → `withGoogleMapsApiKey`, which
+would otherwise read `android.config.googleMaps.apiKey`), the result was a build
+with no key *anywhere* and not one warning — a blank map that looks like a
+network problem. For the same reason the classic `*.config.googleMaps*` fields
+are deliberately not set here; with the plugin declared they are dead config.
+
+Verify what the native build actually receives **before** spending minutes on
+Gradle:
 
 ```bash
 cd apps/mobile
-npx expo config --type prebuild --json   # inspect ios.config / android.config
+env GOOGLE_MAPS_ANDROID_KEY=AIza... npx expo prebuild --platform android --clean
+grep geo.API_KEY android/app/src/main/AndroidManifest.xml
 ```
+
+You want to see:
+`<meta-data android:name="com.google.android.geo.API_KEY" android:value="AIza…"/>`
 
 Then rebuild — these are native inputs, so a JS reload is not enough:
 
