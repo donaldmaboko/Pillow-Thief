@@ -28,13 +28,13 @@ const constants = Constants as unknown as ExecutionEnvironment
 export const IS_EXPO_GO =
   constants.executionEnvironment === 'storeClient' || constants.appOwnership === 'expo'
 
-const hasAndroidKey =
-  (Constants.expoConfig?.extra?.googleMapsAndroidKeyPresent as boolean | undefined) ??
-  String(Constants.expoConfig?.android?.config?.googleMaps?.apiKey ?? '').trim().length > 0
-
-const hasIosKey =
-  (Constants.expoConfig?.extra?.googleMapsIosKeyPresent as boolean | undefined) ??
-  String(Constants.expoConfig?.ios?.config?.googleMapsApiKey ?? '').trim().length > 0
+// app.config.ts is the single source of truth for these, and it sets BOOLEANS
+// rather than the keys so the key is not surfaced in a second place. Reading
+// `*.config.googleMaps*` here would be dead code: app.config.ts deliberately
+// does not set those fields (they are ignored anyway once the react-native-maps
+// plugin is declared).
+const hasAndroidKey = Boolean(Constants.expoConfig?.extra?.googleMapsAndroidKeyPresent)
+const hasIosKey = Boolean(Constants.expoConfig?.extra?.googleMapsIosKeyPresent)
 
 /** Why the native map is not being mounted. `null` means it will render. */
 export type MapsBlockedReason = 'expo-go' | 'no-key' | null
